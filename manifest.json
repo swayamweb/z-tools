@@ -1,0 +1,17 @@
+{
+  "name": "Z-TOOLS | Student OS",
+  "short_name": "Z-TOOLS",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#4F46E5",
+  "description": "Professional Academic Utility Suite",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/7792/7792148.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
