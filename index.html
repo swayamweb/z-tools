@@ -2,19 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Z-TOOLS | Student OS</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; -webkit-tap-highlight-color: transparent; }
         .dark-mode { background-color: #0F172A; }
         .dark-mode .app-card { background-color: #1E293B; border-color: #334155; color: white; }
         .dark-mode .input-field { background-color: #0F172A; border-color: #334155; color: white; }
         .hidden-view { display: none; }
         .mode-btn-active { background-color: #4F46E5; color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
-        .nav-active { color: #4F46E5 ! shadow: 0 -4px 10px rgba(79, 70, 229, 0.1); }
     </style>
 </head>
 <body id="app-body" class="bg-[#F8FAFC] text-slate-900 pb-36">
@@ -30,8 +36,7 @@
     </nav>
 
     <main class="max-w-lg mx-auto mt-6 p-4">
-        
-        <div class="app-card bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 p-8 transition-all">
+        <div class="app-card bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 p-8">
             
             <div id="gpa-view" class="view-content">
                 <h2 class="text-2xl font-extrabold mb-1 tracking-tight">Grade Analytics</h2>
@@ -39,72 +44,53 @@
                     <button onclick="switchGPAMode('sem')" id="btn-sem" class="flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest mode-btn-active">Semester GPA</button>
                     <button onclick="switchGPAMode('cum')" id="btn-cum" class="flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400">Cumulative CGPA</button>
                 </div>
-
-                <div id="sem-form">
-                    <div id="course-list" class="space-y-3"></div>
-                    <button onclick="addCourse()" class="mt-4 text-indigo-600 font-bold text-[10px] uppercase tracking-widest">+ Add Subject</button>
-                </div>
-
-                <div id="cum-form" class="hidden-view">
-                    <div id="sem-list" class="space-y-3"></div>
-                    <button onclick="addSemester()" class="mt-4 text-indigo-600 font-bold text-[10px] uppercase tracking-widest">+ Add Semester</button>
-                </div>
-
+                <div id="sem-form"><div id="course-list" class="space-y-3"></div><button onclick="addCourse()" class="mt-4 text-indigo-600 font-bold text-[10px] uppercase tracking-widest">+ Add Subject</button></div>
+                <div id="cum-form" class="hidden-view"><div id="sem-list" class="space-y-3"></div><button onclick="addSemester()" class="mt-4 text-indigo-600 font-bold text-[10px] uppercase tracking-widest">+ Add Semester</button></div>
                 <div class="mt-8 p-8 bg-[#0F172A] rounded-[2rem] text-center shadow-xl">
-                    <p class="text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-1">Calculated Result</p>
+                    <p class="text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-1">Result</p>
                     <h3 id="result" class="text-5xl font-black text-white tracking-tighter">0.00</h3>
-                    <div class="mt-4 pt-4 border-t border-slate-800">
-                        <p class="text-slate-500 text-[9px] font-bold uppercase tracking-widest mb-1">Percentage Equivalent</p>
-                        <h3 id="percent-result" class="text-2xl font-bold text-indigo-400">0.0%</h3>
-                    </div>
+                    <h3 id="percent-result" class="text-2xl font-bold text-indigo-400 mt-2">0.0%</h3>
                 </div>
-                <button onclick="calculateFinal()" class="w-full mt-6 bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-lg hover:bg-indigo-700 active:scale-95 transition-all">Calculate Analytics</button>
+                <button onclick="calculateFinal()" class="w-full mt-6 bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-lg active:scale-95 transition-all">Calculate</button>
             </div>
 
             <div id="pdf-view" class="view-content hidden-view">
                 <h2 class="text-2xl font-extrabold mb-1 tracking-tight">Smart PDF</h2>
-                <p class="text-slate-400 text-sm mb-6 font-medium">Bundle notes and images.</p>
-                <div class="space-y-4">
-                    <input type="text" id="pdf-title" placeholder="Document Name" class="input-field w-full bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none font-bold">
-                    
-                    <div class="border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl p-6 text-center bg-slate-50/50 dark:bg-slate-900/30">
-                        <label for="img-up" class="cursor-pointer">
-                            <div class="flex flex-col items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Attach Images</span>
-                            </div>
-                        </label>
-                        <input type="file" id="img-up" accept="image/*" multiple class="hidden" onchange="previewImages(event)">
-                        <div id="previews" class="flex flex-wrap gap-2 mt-4 justify-center"></div>
-                    </div>
-
-                    <textarea id="pdf-content" placeholder="Content text..." class="input-field w-full h-32 bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none resize-none"></textarea>
+                <input type="text" id="pdf-title" placeholder="Document Name" class="input-field w-full bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none font-bold mb-4 mt-4">
+                <div class="border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl p-6 text-center bg-slate-50/50 dark:bg-slate-900/30 mb-4">
+                    <label for="img-up" class="cursor-pointer">
+                        <div class="flex flex-col items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Attach Images</span>
+                        </div>
+                    </label>
+                    <input type="file" id="img-up" accept="image/*" multiple class="hidden" onchange="previewImages(event)">
+                    <div id="previews" class="flex flex-wrap gap-2 mt-4 justify-center"></div>
                 </div>
-                <button onclick="generatePDF()" class="w-full mt-8 bg-slate-900 text-white font-black py-5 rounded-2xl shadow-lg active:scale-95 transition-all">Export Document</button>
+                <textarea id="pdf-content" placeholder="Content text..." class="input-field w-full h-32 bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none resize-none"></textarea>
+                <button onclick="generatePDF()" class="w-full mt-6 bg-slate-900 text-white font-black py-5 rounded-2xl shadow-lg active:scale-95 transition-all">Export PDF</button>
             </div>
 
             <div id="synopsis-view" class="view-content hidden-view">
                 <h2 class="text-2xl font-extrabold mb-1 tracking-tight">Synopsis Pro</h2>
-                <p class="text-slate-400 text-sm mb-8 font-medium tracking-tight">Generate professional abstracts.</p>
-                <div class="space-y-4">
+                <div class="space-y-4 mt-6">
                     <input type="text" id="syn-name" placeholder="Project Title" class="input-field w-full bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none font-bold">
-                    <input type="text" id="syn-stack" placeholder="Tech Stack (e.g. Python, SQL)" class="input-field w-full bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none">
-                    <textarea id="syn-desc" placeholder="Project Description..." class="input-field w-full h-24 bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none resize-none"></textarea>
-                    <button onclick="generateSynopsis()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl">Generate Summary</button>
-                    <div id="syn-output" class="hidden p-5 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 text-sm leading-relaxed italic text-slate-600 dark:text-slate-300"></div>
+                    <input type="text" id="syn-stack" placeholder="Tech Stack" class="input-field w-full bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none">
+                    <textarea id="syn-desc" placeholder="Project Goal..." class="input-field w-full h-24 bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none resize-none"></textarea>
+                    <button onclick="generateSynopsis()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-lg">Generate</button>
+                    <div id="syn-output" class="hidden p-5 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 text-sm leading-relaxed italic"></div>
                 </div>
             </div>
 
             <div id="pulse-view" class="view-content hidden-view">
-                <h2 class="text-2xl font-extrabold mb-1 tracking-tight text-center">Deadline Pulse</h2>
-                <div class="space-y-3 mt-8">
+                <h2 class="text-2xl font-extrabold mb-1 tracking-tight">Deadline Pulse</h2>
+                <div class="space-y-3 mt-6">
                     <input type="text" id="task-name" placeholder="Assignment Name" class="input-field w-full bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none">
                     <input type="date" id="task-date" class="input-field w-full bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none">
-                    <button onclick="addTask()" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl shadow-lg">Set Deadline</button>
+                    <button onclick="addTask()" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl">Set Deadline</button>
                 </div>
-                <div id="task-list" class="space-y-3 mt-8 pt-4 border-t border-slate-50 dark:border-slate-800"></div>
+                <div id="task-list" class="space-y-3 mt-8"></div>
             </div>
-
         </div>
     </main>
 
@@ -116,19 +102,15 @@
     </div>
 
     <script>
-        let currentMode = 'sem';
-        let pdfImages = [];
+        let currentMode = 'sem'; let pdfImages = [];
         window.onload = () => { addCourse(); addSemester(); };
-
         function toggleTheme() { document.getElementById('app-body').classList.toggle('dark-mode'); }
-
         function showView(view) {
             document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden-view'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.replace('text-indigo-600', 'text-slate-300'));
             document.getElementById(`${view}-view`).classList.remove('hidden-view');
             document.getElementById(`nav-${view}`).classList.replace('text-slate-300', 'text-indigo-600');
         }
-
         function switchGPAMode(mode) {
             currentMode = mode;
             document.getElementById('sem-form').classList.toggle('hidden-view', mode !== 'sem');
@@ -136,78 +118,59 @@
             document.getElementById('btn-sem').className = `flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${mode === 'sem' ? 'mode-btn-active' : 'text-slate-400'}`;
             document.getElementById('btn-cum').className = `flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${mode === 'cum' ? 'mode-btn-active' : 'text-slate-400'}`;
         }
-
         function calculateFinal() {
-            let score = 0;
+            let s = 0;
             if (currentMode === 'sem') {
-                let pts = 0, crs = 0;
-                document.querySelectorAll('.credit-input').forEach((c, i) => {
-                    const cv = parseFloat(c.value) || 0, gv = parseFloat(document.querySelectorAll('.grade-input')[i].value) || 0;
-                    pts += (cv * gv); crs += cv;
-                });
-                score = crs > 0 ? (pts / crs) : 0;
+                let p = 0, c = 0; document.querySelectorAll('.credit-input').forEach((ci, i) => {
+                    const cv = parseFloat(ci.value) || 0, gv = parseFloat(document.querySelectorAll('.grade-input')[i].value) || 0;
+                    p += (cv * gv); c += cv;
+                }); s = c > 0 ? (p / c) : 0;
             } else {
-                let total = 0, count = 0;
-                document.querySelectorAll('.sem-input').forEach(s => { if(s.value) { total += parseFloat(s.value); count++; } });
-                score = count > 0 ? (total / count) : 0;
+                let t = 0, cn = 0; document.querySelectorAll('.sem-input').forEach(si => { if(si.value) { t += parseFloat(si.value); cn++; } });
+                s = cn > 0 ? (t / cn) : 0;
             }
-            document.getElementById('result').innerText = score.toFixed(2);
-            document.getElementById('percent-result').innerText = (score * 9.5).toFixed(1) + "%";
+            document.getElementById('result').innerText = s.toFixed(2);
+            document.getElementById('percent-result').innerText = (s * 9.5).toFixed(1) + "%";
         }
-
         function addCourse() {
-            const div = document.createElement('div'); div.className = 'grid grid-cols-2 gap-3 mt-3';
-            div.innerHTML = `<input type="number" placeholder="Credits" class="input-field bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none credit-input w-full"><input type="number" placeholder="Grade" class="input-field bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none grade-input w-full">`;
-            document.getElementById('course-list').appendChild(div);
+            const d = document.createElement('div'); d.className = 'grid grid-cols-2 gap-3 mt-3';
+            d.innerHTML = `<input type="number" placeholder="Credits" class="input-field bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none credit-input w-full"><input type="number" placeholder="Grade" class="input-field bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none grade-input w-full">`;
+            document.getElementById('course-list').appendChild(d);
         }
-
         function addSemester() {
-            const input = document.createElement('input');
-            input.className = 'input-field w-full bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none sem-input mt-3';
-            input.placeholder = `Previous SGPA`;
-            document.getElementById('sem-list').appendChild(input);
+            const i = document.createElement('input'); i.className = 'input-field w-full bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none sem-input mt-3';
+            i.placeholder = `Previous SGPA`; document.getElementById('sem-list').appendChild(i);
         }
-
-        function previewImages(event) {
-            const files = event.target.files; const container = document.getElementById('previews');
-            container.innerHTML = ''; pdfImages = [];
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    pdfImages.push(e.target.result);
-                    const img = document.createElement('img'); img.src = e.target.result;
-                    img.className = 'w-10 h-10 object-cover rounded-lg border border-slate-200';
-                    container.appendChild(img);
-                }; reader.readAsDataURL(file);
+        function previewImages(e) {
+            const f = e.target.files; const c = document.getElementById('previews'); c.innerHTML = ''; pdfImages = [];
+            Array.from(f).forEach(file => {
+                const r = new FileReader(); r.onload = (ev) => {
+                    pdfImages.push(ev.target.result);
+                    const im = document.createElement('img'); im.src = ev.target.result;
+                    im.className = 'w-10 h-10 object-cover rounded-lg border border-slate-200'; c.appendChild(im);
+                }; r.readAsDataURL(file);
             });
         }
-
         function generatePDF() {
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
-            const title = document.getElementById('pdf-title').value || "Z-Tools Export";
-            doc.setFont("helvetica", "bold"); doc.text(title, 20, 20);
-            const content = document.getElementById('pdf-content').value;
-            if(content) doc.text(doc.splitTextToSize(content, 170), 20, 35);
+            const t = document.getElementById('pdf-title').value || "Z-Tools Export";
+            doc.setFont("helvetica", "bold"); doc.text(t, 20, 20);
+            const con = document.getElementById('pdf-content').value;
+            if(con) doc.text(doc.splitTextToSize(con, 170), 20, 35);
             pdfImages.forEach(img => { doc.addPage(); doc.addImage(img, 'JPEG', 10, 10, 190, 0); });
-            doc.save(`${title}.pdf`);
+            doc.save(`${t}.pdf`);
         }
-
         function generateSynopsis() {
-            const out = document.getElementById('syn-output');
-            out.innerText = `The project "${document.getElementById('syn-name').value}" utilizes a ${document.getElementById('syn-stack').value} stack to achieve ${document.getElementById('syn-desc').value}. It is built with high efficiency and modular architecture.`;
-            out.classList.remove('hidden');
+            const o = document.getElementById('syn-output');
+            o.innerText = `Project "${document.getElementById('syn-name').value}" uses ${document.getElementById('syn-stack').value} to achieve ${document.getElementById('syn-desc').value}.`;
+            o.classList.remove('hidden');
         }
-
         function addTask() {
-            const n = document.getElementById('task-name').value;
-            const d = document.getElementById('task-date').value;
-            if(!n || !d) return;
-            const diff = Math.ceil((new Date(d) - new Date()) / 86400000);
-            const list = document.getElementById('task-list');
-            const row = document.createElement('div');
-            row.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700";
-            row.innerHTML = `<span class="font-bold text-sm">${n}</span><span class="text-[9px] font-black px-3 py-1 bg-indigo-600 text-white rounded-full uppercase">${diff <= 0 ? 'DUE' : diff + 'd left'}</span>`;
-            list.prepend(row);
+            const n = document.getElementById('task-name').value, d = document.getElementById('task-date').value;
+            if(!n || !d) return; const df = Math.ceil((new Date(d) - new Date()) / 86400000);
+            const r = document.createElement('div'); r.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700";
+            r.innerHTML = `<span class="font-bold text-sm">${n}</span><span class="text-[9px] font-black px-3 py-1 bg-indigo-600 text-white rounded-full uppercase">${df <= 0 ? 'DUE' : df + 'd left'}</span>`;
+            document.getElementById('task-list').prepend(r);
         }
     </script>
 </body>
