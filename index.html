@@ -16,6 +16,14 @@
         .mode-btn-active { background-color: #4F46E5; color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
         .progress-bg { background: #e2e8f0; height: 10px; border-radius: 20px; overflow: hidden; margin-top: 12px; }
         .progress-fill { background: linear-gradient(90deg, #6366f1, #a855f7); height: 100%; transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        /* Mobile Responsive Overrides */
+        input, textarea, button { font-size: 16px !important; } /* Prevents auto-zoom on mobile */
+        @media (max-width: 640px) {
+            .app-card { padding: 1.5rem !important; border-radius: 2rem !important; }
+            header { padding: 2.5rem 1rem !important; }
+            h1 { font-size: 2.25rem !important; }
+        }
     </style>
 </head>
 <body id="app-body" class="bg-[#F8FAFC] text-slate-900 pb-36">
@@ -25,7 +33,7 @@
         <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">Save Time.<br><span class="text-indigo-600">Improve Marks.</span></h1>
         <p class="mt-4 text-slate-500 dark:text-slate-400 text-sm font-medium max-w-xs mx-auto">The all-in-one digital toolkit for high-performance students.</p>
         
-        <div class="mt-6 flex justify-center gap-4 text-[9px] font-black uppercase tracking-tighter text-slate-400">
+        <div class="mt-6 flex flex-wrap justify-center gap-4 text-[9px] font-black uppercase tracking-tighter text-slate-400">
             <span class="flex items-center gap-1">⚡ Instant PDF</span>
             <span class="flex items-center gap-1">🎯 GPA Predictor</span>
             <span class="flex items-center gap-1">📅 Smart Pulse</span>
@@ -82,7 +90,7 @@
 
             <div id="pdf-view" class="view-content hidden-view">
                 <h2 class="text-2xl font-extrabold mb-1 tracking-tight">Smart PDF</h2>
-                <p class="text-indigo-500 text-[10px] font-black uppercase mb-6">Tool to Create and Manage PDFs easily</p>
+                <p class="text-indigo-500 text-[10px] font-black uppercase mb-6">Convert your notes and images into PDFs instantly.</p>
                 <div class="space-y-4">
                     <input type="text" id="pdf-title" placeholder="Document Name" class="input-field w-full bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none font-bold">
                     <input type="file" id="img-up" accept="image/*" multiple class="hidden" onchange="previewImages(event)">
@@ -96,7 +104,7 @@
             </div>
 
             <div id="synopsis-view" class="view-content hidden-view">
-                <h2 class="text-2xl font-extrabold mb-1 tracking-tight">Grammatical Summary </h2>
+                <h2 class="text-2xl font-extrabold mb-1 tracking-tight">Professional Summary Generator</h2>
                 <div class="space-y-4 mt-6">
                     <input type="text" id="syn-name" placeholder="Project Title" class="input-field w-full bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none font-bold">
                     <textarea id="syn-desc" placeholder="Brief Description..." class="input-field w-full h-24 bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none resize-none"></textarea>
@@ -150,18 +158,14 @@
                 });
                 score = crs > 0 ? (pts / crs) : 0;
             } else {
-                // Planner Logic: (Target * (n+1)) - Sum(Previous SGPAs)
                 let totalPrev = 0, count = 0;
                 document.querySelectorAll('.sem-input').forEach(s => { if(s.value) { totalPrev += parseFloat(s.value); count++; } });
                 const target = parseFloat(document.getElementById('target-cgpa').value) || 0;
                 score = (target * (count + 1)) - totalPrev;
-                
-                // Update Progress Bar
                 const prog = (target / 10) * 100;
                 document.getElementById('prog-fill').style.width = Math.min(prog, 100) + "%";
                 document.getElementById('share-btn').classList.remove('hidden');
             }
-            
             document.getElementById('result').innerText = score.toFixed(2);
             document.getElementById('percent-result').innerText = score > 10 ? "🔥 Target too high!" : (score < 4 ? "Keep Pushing!" : "Highly Possible!");
         }
@@ -172,7 +176,6 @@
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
         }
 
-        /* Rest of your core functions kept intact */
         function addCourse() {
             const div = document.createElement('div'); div.className = 'grid grid-cols-2 gap-3 mt-3';
             div.innerHTML = `<input type="number" placeholder="Credits" class="input-field bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none credit-input w-full"><input type="number" placeholder="Grade" class="input-field bg-slate-50 p-4 rounded-2xl border border-slate-100 outline-none grade-input w-full">`;
